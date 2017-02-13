@@ -5088,7 +5088,21 @@ __global__ void _maskColumnsValue(ElemType* a, const char* columnsMask, CUDA_LON
     }
 }
 
-// calculate alpha in forward-backward calculation. equation (6), (7) in http://machinelearning.wustl.edu/mlpapers/paper_files/icml2006_GravesFGS06.pdf
+// Calculate alpha in forward-backward calculation. equation (6), (7) in http://machinelearning.wustl.edu/mlpapers/paper_files/icml2006_GravesFGS06.pdf
+// GPU x dimension corresponds to utterances, y dimension corresponds to phone sequence in each utterance
+// prob (input): the posterior output from the network
+// alpha (output): alpha for forward-backward calculation. 
+// phoneSeq (input): phone ID sequence for each utterance in this minibatch, each col is one utterance 
+// phoneBound (input): phone boundary (frame index) of each phone for each utterance in this minibatch, each col is one utterance 
+// uttToChanInd (input):  map from utterance ID to minibatch channel ID. We need this because each channel may contain more than one utterance.
+// uttFrameNum (input): the frame number of each utterance. The size of this vector =  the number of all utterances in this minibatch
+// uttBeginFrame(input): the positon of the first frame of each utterance in the minibatch channel. We need this because each channel may contain more than one utterance.
+// uttPhoneNum (input): the phone number of each utterance. The size of this vector =  the number of all utterances in this minibatch
+// numChannels (input): channel number in this minibatch
+// uttNum (input): number of utterances
+// t (input): time stamp to process
+// maxPhoneNum (input): the max number of phones between utterances
+// totalPhoneNum (input): the total number of phones of all utterances
 template<class ElemType>
 __global__ void _assignAlphaScore(
     const ElemType *prob,
@@ -5119,7 +5133,6 @@ __global__ void _assignAlphaScore(
     // Current and previous phone indices in phoneSeq matrix
     LONG64 labelid = uttId*maxPhoneNum + phoneSeqId;
     LONG64 labelid_2 = labelid - 2;
-    LONG64 labelid_r = labelid + 2;
 
     // Actual current phone label
     LONG64 phoneId = (LONG64)(phoneSeq[labelid]);
@@ -5175,10 +5188,11 @@ __global__ void _assignAlphaScore(
             alphaScore[alphaId] = (ElemType)x + ascore;
             if (delayConstraint != -1)
             {
+                LONG64 labelid_r = labelid + 2;
                 LONG64 phoneBoundId_r = (LONG64)(phoneBound[labelid_r]);
                 if (phoneId == totalPhoneNum - 1)
                 {
-                    //only constraint right side
+                    // only constraint right side
                     if (t > phoneBoundId_r + delayConstraint - 1)
                         alphaScore[alphaId] = LZERO;
                 }
@@ -5280,7 +5294,7 @@ __global__ void _assignBetaScore(
     }
 }
 
-// calculate derivative, equation (15) in http://machinelearning.wustl.edu/mlpapers/paper_files/icml2006_GravesFGS06.pdf
+// Calculate derivative, equation (15) in http://machinelearning.wustl.edu/mlpapers/paper_files/icml2006_GravesFGS06.pdf
 template<class ElemType>
 __global__ void _assignCTCScore(
     ElemType *CTCscore,
@@ -5332,7 +5346,7 @@ __global__ void _assignCTCScore(
     }
 }
 
-//calculate CTC score. equation (8) in http://machinelearning.wustl.edu/mlpapers/paper_files/icml2006_GravesFGS06.pdf 
+// Calculate CTC score. equation (8) in http://machinelearning.wustl.edu/mlpapers/paper_files/icml2006_GravesFGS06.pdf 
 template<class ElemType>
 __global__ void _assignTotalScore(ElemType *betaScore,
     ElemType *totalScore,
