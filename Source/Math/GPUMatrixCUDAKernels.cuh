@@ -5103,6 +5103,9 @@ __global__ void _maskColumnsValue(ElemType* a, const char* columnsMask, CUDA_LON
 // t (input): time stamp to process
 // maxPhoneNum (input): the max number of phones between utterances
 // totalPhoneNum (input): the total number of phones of all utterances
+// delayConstraint -- label output delay constraint introduced during training that allows to have shorter delay during inference.
+//      Setting this parameter smaller will result in shorted delay between label output during decoding.
+//      delayConstraint=-1 means no constraint
 template<class ElemType>
 __global__ void _assignAlphaScore(
     const ElemType *prob,
