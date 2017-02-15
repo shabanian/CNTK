@@ -82,7 +82,8 @@ BOOST_AUTO_TEST_CASE(ImageSimpleCompositeAndBase64)
     test(
     {
         L"MapFile=\"$RootDir$/Base64ImageReaderSimple_map.txt\"",
-        L"DeserializerType=\"Base64ImageDeserializer\""
+        L"DeserializerType=\"Base64ImageDeserializer\"",
+        L"useNumericSequenceKeys=true"
     });
 };
 
@@ -112,8 +113,9 @@ BOOST_AUTO_TEST_CASE(InvalidImageSimpleCompositeAndBase64)
     test(
     {
         L"MapFile=\"$RootDir$/InvalidBase64ImageReaderSimple_map.txt\"",
-        L"DeserializerType=\"Base64ImageDeserializer\""
-        L"maxErrors=4"
+        L"DeserializerType=\"Base64ImageDeserializer\"",
+        L"maxErrors=4",
+        L"useNumericSequenceKeys=true"
     });
 };
 
@@ -169,7 +171,8 @@ BOOST_AUTO_TEST_CASE(Base64WithWriteIds)
         std::vector<std::wstring> additionalParameters
         {
             L"MapFile=\"$RootDir$/Base64ImageReaderSimple_map.txt\"",
-            L"DeserializerType=\"Base64ImageDeserializer\""
+            L"DeserializerType=\"Base64ImageDeserializer\"",
+            L"useNumericSequenceKeys=true"
         };
 
         multiset<string> actualKeys;
