@@ -28,7 +28,7 @@ import itertools
 @pytest.mark.parametrize("executionNumber, mbsize", list(itertools.product(range(10),[4,8])))
 def test_alexnet_imagenet_distributed(device_id, executionNumber, mbsize):
     params = [ "-n", "2",
-               "-m", mbsize,
+               "-m", str(mbsize),
                "-e", "16",
                "-datadir", prepare_ImageNet_data(),
                "-q", "32",
