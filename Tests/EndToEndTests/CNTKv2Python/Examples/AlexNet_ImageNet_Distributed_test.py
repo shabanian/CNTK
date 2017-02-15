@@ -26,7 +26,7 @@ script_under_test = os.path.join(example_dir, "AlexNet_ImageNet_Distributed.py")
 import itertools
 
 @pytest.mark.parametrize("executionNumber, mbsize", list(itertools.product(range(10),[4,8])))
-def test_alexnet_imagenet_distributed(device_id, mbsize):
+def test_alexnet_imagenet_distributed(device_id, executionNumber, mbsize):
     params = [ "-n", "2",
                "-m", mbsize,
                "-e", "16",
